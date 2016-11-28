@@ -78,6 +78,9 @@ class GaussianMixtureModel(object):
 		mu_est = mu_init
 		sigma_est = sigma_init
 		while i < max_iter:
+			print(pi_est)
+			print(mu_est)
+			print(sigma_est)
 			gamma_z = self.E_step(pi_est, mu_est, sigma_est)
 			# pdb.set_trace()
 			[pi_est, mu_est, sigma_est] = self.M_step(gamma_z)

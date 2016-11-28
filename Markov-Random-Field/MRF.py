@@ -115,7 +115,7 @@ class MRF(object):
 				hyp_energy = n.node_energy()
 				if hyp_energy < current_energy:
 					num_change+=1
-					print(num_change)
+					# print(num_change)
 				else:
 					n.value = -n.value
 	def denoise(self, im):
@@ -155,7 +155,7 @@ im = np.ones([200,200])
 im[100:150,100:150] = -1
 plt.figure()
 plt.imshow(im)
-for i in range(0,10000):
+for i in range(0,1000):
 	x = randint(0,199)
 	y = randint(0,199)
 	im[y][x] = -im[y][x]
