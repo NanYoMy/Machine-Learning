@@ -6,6 +6,7 @@ import math
 import pdb
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
+from numba import jit
 class GaussianMixtureModel(object):
 	def __init__(self, data, K):#, pi_init, mu_init, sigma_init):
 		self.data = data
@@ -22,7 +23,7 @@ class GaussianMixtureModel(object):
 	# self.pi = np.tile(0.0, self.K)
 	# self.mu = [np.array([0.0, 0, 0]) for i in range(self.K)]  # row vectors...
 	# self.sigma = [np.matrix([[1, 0.0, 0], [0, 1.0, 0], [0, 0.0, 1]]) for i in range(K)]
-
+	@profile
 	def E_step(self, pi_old, mu_old, sigma_old):
 		# pdb.set_trace()
 		normals = [stats.multivariate_normal(mean=mu_old[i], cov=sigma_old[i]) for i in range(self.K)]
@@ -71,16 +72,16 @@ class GaussianMixtureModel(object):
 	# 			log_arg = 0
 	# 			for k in range(self.K):
 	# 				log_arg+= pi[k](math.log(pi[k]) - math.log
-
+	# @profile
 	def estimate_parameters(self, max_iter, pi_init,mu_init, sigma_init):
 		i = 0
 		pi_est = pi_init
 		mu_est = mu_init
 		sigma_est = sigma_init
 		while i < max_iter:
-			print(pi_est)
-			print(mu_est)
-			print(sigma_est)
+			# print(pi_est)
+			# print(mu_est)
+			# print(sigma_est)
 			gamma_z = self.E_step(pi_est, mu_est, sigma_est)
 			# pdb.set_trace()
 			[pi_est, mu_est, sigma_est] = self.M_step(gamma_z)
