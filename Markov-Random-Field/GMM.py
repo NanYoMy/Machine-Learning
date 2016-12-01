@@ -23,7 +23,7 @@ class GaussianMixtureModel(object):
 	# self.pi = np.tile(0.0, self.K)
 	# self.mu = [np.array([0.0, 0, 0]) for i in range(self.K)]  # row vectors...
 	# self.sigma = [np.matrix([[1, 0.0, 0], [0, 1.0, 0], [0, 0.0, 1]]) for i in range(K)]
-	@profile
+	# @profile
 	def E_step(self, pi_old, mu_old, sigma_old):
 		# pdb.set_trace()
 		normals = [stats.multivariate_normal(mean=mu_old[i], cov=sigma_old[i]) for i in range(self.K)]
@@ -86,7 +86,7 @@ class GaussianMixtureModel(object):
 			# pdb.set_trace()
 			[pi_est, mu_est, sigma_est] = self.M_step(gamma_z)
 			i += 1
-		return np.array([pi_est, mu_est, sigma_est])
+		return [pi_est, mu_est, sigma_est]
 
 
 #### Main Code ####
