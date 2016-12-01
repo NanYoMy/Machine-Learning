@@ -1,5 +1,6 @@
 import numpy as np
 from random import randint
+import random
 from scipy import stats
 from scipy import misc
 import math
@@ -7,13 +8,17 @@ import pdb
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from numba import jit
+sd = 1
+np.random.seed(sd)
+random.seed(sd)
+
 class GaussianMixtureModel(object):
 	def __init__(self, data, K):#, pi_init, mu_init, sigma_init):
 		self.data = data
 		self.K = K
-		# self.pi = pi_init
-		# self.mu = mu_init
-		# self.sigma = sigma_init
+		self.pi = np.array([1.0/K] * K)
+		self.mu = np.random.rand(K,3)
+		self.sigma = [np.eye(3)*random.uniform(1,2)]*K
 
 	# def init_labels_params(self):
 	# self.labels = np.zeros(self.data.shape)
@@ -30,12 +35,14 @@ class GaussianMixtureModel(object):
 		gamma_z = np.zeros([self.K, self.data.shape[0], self.data.shape[1]])
 		for i in range(self.data.shape[0]):
 			for j in range(self.data.shape[1]):
-				gamma_denom = 0.0
-				for k in range(self.K):
+				# gamma_denom = 0.0
+				# for k in range(self.K):
 					# pdb.set_trace()
-					gamma_denom += pi_old[k] * normals[k].pdf(x=self.data[i, j, 0:3])  # ignore alpha channel
+					# gamma_denom += pi_old[k] * normals[k].pdf(x=self.data[i, j])  # ignore alpha channel
 				for l in range(self.K):
-					gamma_z[l, i, j] = pi_old[l] * normals[l].pdf(x=self.data[i, j, 0:3]) / gamma_denom
+					gamma_z[l, i, j] = pi_old[l] * normals[l].pdf(x=self.data[i, j]) # / gamma_denom
+				gamma_denom = gamma_z[:, i, j].sum(axis=0)
+				gamma_z[:, i, j] = gamma_z[:, i, j] / gamma_denom
 		return gamma_z
 
 	def M_step(self, gamma_z):
@@ -49,19 +56,19 @@ class GaussianMixtureModel(object):
 		pi_new = N / (self.data.shape[0]*self.data.shape[1])
 
 		# estimate mu
-		mu_new = [np.array([0.0, 0, 0]) for i in range(self.K)]
+		mu_new = [np.array([0.0, 0, 0]) for _ in range(self.K)]
 		for i in range(self.data.shape[0]):  # TODO:vectorize
 			for j in range(self.data.shape[1]):
 				for k in range(self.K):
 					# pdb.set_trace()
-					mu_new[k] += gamma_z[k, i, j] * self.data[i, j, 0:3] / N[k]
+					mu_new[k] += gamma_z[k, i, j] * self.data[i, j] / N[k]
 
-		sigma_new = [np.matrix([[0.0, 0, 0], [0.0, 0, 0], [0.0, 0, 0]]) for i in range(self.K)]
+		sigma_new = [np.matrix([[0.0, 0, 0], [0.0, 0, 0], [0.0, 0, 0]]) for _ in range(self.K)]
 		for i in range(self.data.shape[0]):  # TODO:vectorize
 			for j in range(self.data.shape[1]):
-				diffs = [np.matrix(self.data[i, j, 0:3] - mu_new[k]) for k in range(self.K)]
+				diffs = [np.matrix(self.data[i, j] - mu_new[k]) for k in range(self.K)]
 				for k in range(self.K):
-					sigma_new[k] += gamma_z[k, i, j] * (np.matrix.transpose(diffs[k]).dot(diffs[k])) / N[k]
+					sigma_new[k] += gamma_z[k, i, j] * diffs[k].T*(diffs[k]) / N[k]
 		return [pi_new, mu_new, sigma_new]
 
 	# def likelihood(self,gamma_z,pi,mu,sigma):
@@ -73,11 +80,11 @@ class GaussianMixtureModel(object):
 	# 			for k in range(self.K):
 	# 				log_arg+= pi[k](math.log(pi[k]) - math.log
 	# @profile
-	def estimate_parameters(self, max_iter, pi_init,mu_init, sigma_init):
+	def estimate_parameters(self, max_iter):
 		i = 0
-		pi_est = pi_init
-		mu_est = mu_init
-		sigma_est = sigma_init
+		pi_est = self.pi
+		mu_est = self.mu
+		sigma_est = self.sigma
 		while i < max_iter:
 			# print(pi_est)
 			# print(mu_est)
@@ -108,16 +115,22 @@ im = np.zeros([NN, NN, 3])
 for ii in range(NN):
 	for jj in range(NN):
 		# plt.hold(true)
-		im[ii, jj, 0:3] = np.random.multivariate_normal(mean=mu[z[ii, jj]], cov=sigma[z[ii, jj]])
+		im[ii, jj] = np.random.multivariate_normal(mean=mu[z[ii, jj]], cov=sigma[z[ii, jj]])
 
-init_pi = [0.5, 0.5]
-init_mu = [np.array([10.0, 10.0, 1.0]), np.array([0.0, 0.0, 0.0])]
-init_sigma = [np.matrix([[1000.0, 0.0, 0.0], [0.0, 157.0, 0.0], [0.0, 0.0, 1.0]]) for i in range(K)]
+# init_pi = [0.5, 0.5]
+# init_mu = [np.array([10.0, 10.0, 1.0]), np.array([0.0, 0.0, 0.0])]
+# init_sigma = [np.matrix([[1000.0, 0.0, 0.0], [0.0, 157.0, 0.0], [0.0, 0.0, 1.0]]) for i in range(K)]
 
 # GMM.init_labels_params()
 # im = misc.imresize(mpimg.imread("/Users/Oliver/Desktop/watershed.png"),5)/255
 GMM = GaussianMixtureModel(im, K)
-ests = GMM.estimate_parameters(10, init_pi, init_mu, init_sigma)
+ests = GMM.estimate_parameters(100)
 # print(ests)
-# plt.imshow(im)
+# for est in ests:
+print(sigma[0])
+print(ests[2][0])
+# plt.figure(1)
+# plt.imshow(sigma[0])
+# plt.figure(2)
+# plt.imshow(ests[2][0])
 # plt.show()
