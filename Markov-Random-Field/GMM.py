@@ -86,7 +86,7 @@ class GaussianMixtureModel(object):
 			# pdb.set_trace()
 			[pi_est, mu_est, sigma_est] = self.M_step(gamma_z)
 			i += 1
-		return [pi_est, mu_est, sigma_est]
+		return np.array([pi_est, mu_est, sigma_est])
 
 
 #### Main Code ####
