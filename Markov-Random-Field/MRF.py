@@ -169,9 +169,9 @@ if __name__ == "__main__":
 	plt.imshow(im)
 	imageField = MRF()
 	imageField.loadIm(im)
-	blah=imageField.denoise(im)
+	denoised_im=imageField.denoise(im)
 	plt.figure()
-	plt.imshow(blah)
+	plt.imshow(denoised_im)
 	plt.show()
 
 
