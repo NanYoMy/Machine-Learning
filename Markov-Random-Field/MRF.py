@@ -150,23 +150,29 @@ class MRF(object):
 # print(nlist)
 # print(mlist)
 # pdb.set_trace()
+
 ####### Create MRF from image ########
-im = np.ones([200,200])
-im[100:150,100:150] = -1
-plt.figure()
-plt.imshow(im)
-for i in range(0,1000):
-	x = randint(0,199)
-	y = randint(0,199)
-	im[y][x] = -im[y][x]
-plt.figure()
-plt.imshow(im)
-imageField = MRF()
-imageField.loadIm(im)
-blah=imageField.denoise(im)
-plt.figure()
-plt.imshow(blah)
-plt.show()
+
+if __name__ == "__main__":
+
+
+	## Demo: Using ynthetic image, displays original (Fig 1), noised (Fig2), and denoised (Fig 3). 
+	im = np.ones([200,200])
+	im[100:150,100:150] = -1
+	plt.figure()
+	plt.imshow(im)
+	for i in range(0,1000):
+		x = randint(0,199)
+		y = randint(0,199)
+		im[y][x] = -im[y][x]
+	plt.figure()
+	plt.imshow(im)
+	imageField = MRF()
+	imageField.loadIm(im)
+	blah=imageField.denoise(im)
+	plt.figure()
+	plt.imshow(blah)
+	plt.show()
 
 
 
