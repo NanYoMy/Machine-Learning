@@ -40,7 +40,6 @@ def pair_energy(node1,node2):
 
 
 class MRF(object):
-	nodes = []
 	def __init__(self):
 		self.nodes = []
 	def _not_out_of_bounds(self,im,i,j):
