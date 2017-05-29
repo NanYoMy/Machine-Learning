@@ -5,7 +5,7 @@ import pdb
 from random import randint
 
 class node(object):
-	def __init__(self,value,observed):#TODO: add label when repurposed for seg
+	def __init__(self,value,observed):
 		self.value = value
 		# self.label = label
 		self.observed = observed
@@ -83,18 +83,11 @@ class MRF(object):
 
 	def add_node(self,n):
 		self.nodes.append(n)
-	# def compute_energy(self):
-	# 	total=0
-	# 	checked_pair = []
-	# 	for n in self.nodes:
-	# 		total += singleton_energy(n)
-	# 		for neighbor in n.neighbors:
-	# 			if [n,neighbor] not in checked_pair and [neighbor,n] not in checked_pair:#TODO: check this line for weird bugs
-	# 				total += pair_energy(n,neighbor)
-	# 				checked_pair.append([n,neighbor])
+		
 	def print_nodes(self):#TODO: for debugging, remove later
 		for n in self.nodes:
 			print(str(n.value) + " " + str(n.observed))
+			
 	def minimize_energy(self):
 		num_change = 1# TODO: hacky, rewrite
 		while num_change >0:
