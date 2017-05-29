@@ -41,7 +41,10 @@ def pair_energy(node1,node2):
 
 class MRF(object):
 	nodes = []
-
+	def __init__(self):
+		self.nodes = []
+	def _not_out_of_bounds(self,im,i,j):
+		return 0 <= i < im.shape[0] and 0 <= j < im.shape[1]
 
 	def loadIm(self,im):
 		if len(im.shape) >2:
@@ -67,26 +70,14 @@ class MRF(object):
 
 				latent_nodes[i][j].add_neighbor(image_nodes[i][j])
 
-				#boundary cases!!! :)))))))))))
+				# boundary cases!!! :)))))))))))
 				# pdb.set_trace()
-				if i == 0 and j==0:
-					neigh_idx = np.array([[i+1,j],[i,j+1]]) # top left corner
-				elif i==0 and j==im.shape[1]-1:# top right corner
-					neigh_idx = np.array([[i,j-1],[i+1,j]])
-				elif i==im.shape[0]-1 and j==im.shape[1]-1: # bottom right corner
-					neigh_idx = np.array([[i-1,j],[i,j-1]])
-				elif i==im.shape[0]-1 and j==0:#bottom left corner
-					neigh_idx = np.array([[i-1,j],[i,j+1]])
-				elif i==0:
-					neigh_idx = np.array([[i+1,j],[i,j+1],[i,j-1]]) # top edge
-				elif j==im.shape[1]-1:# right edge
-					neigh_idx = np.array([[i,j-1],[i-1,j],[i+1,j]])
-				elif i==im.shape[0]-1:#bottom edge
-					neigh_idx = np.array([[i-1,j],[i,j-1],[i,j+1]])
-				elif j==0:
-					neigh_idx = np.array([[i+1,j],[i,j+1],[i-1,j]]) # left edge
-				else:
-					neigh_idx = np.array([[i+1,j],[i,j+1],[i-1,j],[i,j-1]])
+				top = (i-1,j)
+				bottom = (i+1,j)
+				left = (i,j-1)
+				right = (i,j+1)
+				indices = [top,bottom,left,right]
+				neigh_idx = [idx for idx in indices if self._not_out_of_bounds(im,idx[0],idx[1])]
 				for idx in neigh_idx:
 					latent_nodes[i][j].add_neighbor(latent_nodes[idx[0]][idx[1]])
 				self.add_node(latent_nodes[i][j])
@@ -161,7 +152,7 @@ if __name__ == "__main__":
 	im[100:150,100:150] = -1
 	plt.figure()
 	plt.imshow(im)
-	for i in range(0,1000):
+	for i in range(0,5000):
 		x = randint(0,199)
 		y = randint(0,199)
 		im[y][x] = -im[y][x]
